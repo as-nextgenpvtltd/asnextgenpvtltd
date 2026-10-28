@@ -935,11 +935,21 @@
     .core-nodes {
       position: absolute;
       inset: 0;
+      z-index: 10;
+      pointer-events: none;
     }
 
     .node {
       position: absolute;
       transform: translate(-50%, -50%);
+      pointer-events: auto;
+      z-index: 5;
+    }
+
+    .node.active,
+    .node:hover,
+    .node:focus-within {
+      z-index: 40;
     }
 
     .node-btn {
@@ -1014,20 +1024,24 @@
 
     .node-tooltip {
       position: absolute;
-      background: var(--ink-2);
+      background: rgba(18, 22, 34, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--border-strong);
       border-radius: 10px;
       padding: 10px 14px;
-      white-space: nowrap;
       font-size: 12px;
-      z-index: 10;
+      z-index: 50;
       opacity: 0;
       pointer-events: none;
-      transition: opacity .2s var(--ease);
+      transition: opacity .25s var(--ease), transform .25s var(--ease);
       bottom: calc(100% + 10px);
       left: 50%;
       transform: translateX(-50%);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .55), 0 0 20px rgba(201, 168, 76, 0.15);
+      width: max-content;
+      max-width: min(230px, calc(100vw - 40px));
+      white-space: normal;
     }
 
     .node-tooltip.visible {
@@ -1039,12 +1053,55 @@
       font-size: 13px;
       color: var(--aurora);
       margin-bottom: 3px;
+      white-space: nowrap;
     }
 
     .node-tooltip span {
+      display: block;
       color: var(--slate);
       font-size: 11px;
-      line-height: 1.5;
+      line-height: 1.45;
+    }
+
+    /* Directional Tooltip Alignments for optimal responsiveness and core hub clearance */
+    .node-tooltip.pos-top {
+      bottom: calc(100% + 12px);
+      top: auto;
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+    }
+
+    .node-tooltip.pos-top-left {
+      bottom: calc(100% + 12px);
+      top: auto;
+      left: 0;
+      right: auto;
+      transform: none;
+    }
+
+    .node-tooltip.pos-top-right {
+      bottom: calc(100% + 12px);
+      top: auto;
+      right: 0;
+      left: auto;
+      transform: none;
+    }
+
+    .node-tooltip.pos-bottom-left {
+      top: calc(100% + 12px);
+      bottom: auto;
+      left: 0;
+      right: auto;
+      transform: none;
+    }
+
+    .node-tooltip.pos-bottom-right {
+      top: calc(100% + 12px);
+      bottom: auto;
+      right: 0;
+      left: auto;
+      transform: none;
     }
 
 
@@ -1127,6 +1184,7 @@
 
       .core-container {
         max-width: 360px;
+        margin: 10px auto 40px;
       }
     }
 
@@ -5382,7 +5440,7 @@
           <div class="carousel reveal">
             <div class="carousel-track">
               <div class="carousel-slides" id="slides" aria-live="polite">
-                <div class="slide" role="group" aria-label="Testimonial 1 of 2">
+                <div class="slide" role="group" aria-label="Testimonial 1 of 3">
                   <div class="quote-mark" aria-hidden="true">"</div>
                   <p class="quote">
                     What stood out was the way A/S NEXTGEN turned an idea into a clear,
@@ -5395,6 +5453,16 @@
                   </div>
                 </div>
                 <div class="slide" role="group" aria-label="Testimonial 2 of 3">
+                  <div class="quote-mark" aria-hidden="true">"</div>
+                  <p class="quote">
+                    Building robust, future-ready digital systems requires strong engineering discipline and clear direction. We focus on delivering real value and scalable solutions for every client.
+                  </p>
+                  <div class="slide-person">
+                    <div class="avatar" aria-hidden="true">AM</div>
+                    <p>ABI.M </p><span>CEO</span>
+                  </div>
+                </div>
+                <div class="slide" role="group" aria-label="Testimonial 3 of 3">
                   <div class="quote-mark" aria-hidden="true">"</div>
                   <p class="quote">
                     The team brought together creativity and technology in a way that made
@@ -6262,13 +6330,13 @@
           if (!container) return;
 
           const nodeData = [
-            { id: 'ai', label: 'AI', angle: 0, title: 'AI Integration', desc: 'Smart automation and decision engines' },
-            { id: 'web', label: 'WEB', angle: 51.4, title: 'Web Engineering', desc: 'React, Next.js, TypeScript builds' },
-            { id: 'mobile', label: 'MOBILE', angle: 102.8, title: 'Mobile Apps', desc: 'React Native & Flutter' },
-            { id: 'cloud', label: 'CLOUD', angle: 154.2, title: 'Cloud & DevOps', desc: 'Docker, CI/CD, deployment' },
-            { id: 'data', label: 'DATA', angle: 205.6, title: 'Data Layer', desc: 'PostgreSQL, MongoDB, MySQL' },
-            { id: 'auto', label: 'AUTO', angle: 257, title: 'Automation', desc: 'Workflow & process automation' },
-            { id: 'erp', label: 'ERP', angle: 308.4, title: 'ERP & SaaS', desc: 'Enterprise platform engineering' },
+            { id: 'ai', label: 'AI', angle: 0, title: 'AI Integration', desc: 'Smart automation and decision engines', posClass: 'pos-top' },
+            { id: 'web', label: 'WEB', angle: 51.4, title: 'Web Engineering', desc: 'React, Next.js, TypeScript builds', posClass: 'pos-top-right' },
+            { id: 'mobile', label: 'MOBILE', angle: 102.8, title: 'Mobile Apps', desc: 'React Native & Flutter', posClass: 'pos-bottom-right' },
+            { id: 'cloud', label: 'CLOUD', angle: 154.2, title: 'Cloud & DevOps', desc: 'Docker, CI/CD, deployment', posClass: 'pos-bottom-right' },
+            { id: 'data', label: 'DATA', angle: 205.6, title: 'Data Layer', desc: 'PostgreSQL, MongoDB, MySQL', posClass: 'pos-bottom-left' },
+            { id: 'auto', label: 'AUTO', angle: 257, title: 'Automation', desc: 'Workflow & process automation', posClass: 'pos-bottom-left' },
+            { id: 'erp', label: 'ERP', angle: 308.4, title: 'ERP & SaaS', desc: 'Enterprise platform engineering', posClass: 'pos-top-left' },
           ];
 
           const nodesContainer = qs('#coreNodes');
@@ -6280,6 +6348,32 @@
           }
 
           const RADIUS = 38; // % of container
+          let currentActiveId = null;
+
+          function activate(id) {
+            if (currentActiveId && currentActiveId !== id) {
+              deactivate(currentActiveId);
+            }
+            currentActiveId = id;
+            const nodeEl = qs('#node-' + id);
+            if (nodeEl) {
+              nodeEl.classList.add('active');
+              nodeEl.querySelector('.node-btn')?.classList.add('active');
+              nodeEl.querySelector('.node-tooltip')?.classList.add('visible');
+              qs('#line-' + id)?.classList.add('visible');
+            }
+          }
+
+          function deactivate(id) {
+            const nodeEl = qs('#node-' + id);
+            if (nodeEl) {
+              nodeEl.classList.remove('active');
+              nodeEl.querySelector('.node-btn')?.classList.remove('active');
+              nodeEl.querySelector('.node-tooltip')?.classList.remove('visible');
+              qs('#line-' + id)?.classList.remove('visible');
+            }
+            if (currentActiveId === id) currentActiveId = null;
+          }
 
           // Create nodes
           nodeData.forEach(n => {
@@ -6293,7 +6387,7 @@
       <button class="node-btn" aria-label="${n.title}: ${n.desc}" aria-describedby="tooltip-${n.id}">
         <span>${n.label}</span>
       </button>
-      <div class="node-tooltip" id="tooltip-${n.id}" role="tooltip">
+      <div class="node-tooltip ${n.posClass}" id="tooltip-${n.id}" role="tooltip">
         <strong>${n.title}</strong>
         <span>${n.desc}</span>
       </div>
@@ -6318,21 +6412,58 @@
             updateLine();
             on(window, 'resize', updateLine);
 
-            function activate() {
-              btn.classList.add('active');
-              tooltip.classList.add('visible');
-              if (line) line.classList.add('visible');
-            }
-            function deactivate() {
-              btn.classList.remove('active');
-              tooltip.classList.remove('visible');
-              if (line) line.classList.remove('visible');
-            }
+            on(btn, 'mouseenter', () => {
+              if (!currentActiveId) {
+                btn.classList.add('active');
+                tooltip.classList.add('visible');
+                nodeEl.classList.add('active');
+                if (line) line.classList.add('visible');
+              }
+            });
+            on(btn, 'mouseleave', () => {
+              if (currentActiveId !== n.id) {
+                btn.classList.remove('active');
+                tooltip.classList.remove('visible');
+                nodeEl.classList.remove('active');
+                if (line) line.classList.remove('visible');
+              }
+            });
+            on(btn, 'click', e => {
+              e.stopPropagation();
+              if (currentActiveId === n.id) {
+                deactivate(n.id);
+              } else {
+                activate(n.id);
+              }
+            });
+            on(btn, 'focus', () => {
+              if (!currentActiveId) {
+                btn.classList.add('active');
+                tooltip.classList.add('visible');
+                nodeEl.classList.add('active');
+                if (line) line.classList.add('visible');
+              }
+            });
+            on(btn, 'blur', () => {
+              if (currentActiveId !== n.id) {
+                btn.classList.remove('active');
+                tooltip.classList.remove('visible');
+                nodeEl.classList.remove('active');
+                if (line) line.classList.remove('visible');
+              }
+            });
+          });
 
-            on(btn, 'mouseenter', activate);
-            on(btn, 'mouseleave', deactivate);
-            on(btn, 'focus', activate);
-            on(btn, 'blur', deactivate);
+          // Dismiss active node on click outside or escape key
+          on(document, 'click', e => {
+            if (currentActiveId && !container.contains(e.target)) {
+              deactivate(currentActiveId);
+            }
+          });
+          on(document, 'keydown', e => {
+            if (e.key === 'Escape' && currentActiveId) {
+              deactivate(currentActiveId);
+            }
           });
 
           // Mouse parallax on core orb
