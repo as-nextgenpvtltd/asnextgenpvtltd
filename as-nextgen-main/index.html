@@ -5941,7 +5941,8 @@
               </div>
               <form class="contact-form" id="contactForm" novalidate>
                 <input type="hidden" name="access_key" value="eeac3757-67be-4a81-8573-be9372df3d12">
-                <input type="hidden" name="form_subject" value="New Project Enquiry - A/S NEXTGEN">
+                <input type="hidden" name="subject" value="New Project Enquiry - A/S NEXTGEN">
+                <input type="checkbox" name="botcheck" class="hidden" style="display:none">
                 <!-- Step 1 -->
                 <div class="form-step active" id="fstep1">
                   <div class="field-row">
@@ -5963,12 +5964,8 @@
                       </svg></button>
                   </div>
                 </div>
-            </div>
-            </svg></button>
-          </div>
-        </div>
-        <!-- Step 2 -->
-        <div class="form-step" id="fstep2">
+                <!-- Step 2 -->
+                <div class="form-step" id="fstep2">
           <div class="field">
             <label for="ftype">PROJECT TYPE</label>
             <select id="ftype" name="project_type">
@@ -6024,7 +6021,7 @@
           </div>
           <div class="form-nav">
             <button type="button" class="form-back" id="fBack3">← Back</button>
-            <button type="submit" class="btn btn-primary">Send Message <svg>
+            <button type="submit" form="contactForm" class="btn btn-primary" id="fSubmit">Send Message <svg>
                 <use href="#ic-arrow" />
               </svg></button>
           </div>
@@ -7529,8 +7526,12 @@
         const fmsg = qs('#fmessage');
 
         // Validate final step
-        if (!fsubj.value.trim() || !fmsg.value.trim()) {
-          form.reportValidity();
+        if (!fsubj.value.trim()) {
+          fsubj.focus();
+          return;
+        }
+        if (!fmsg.value.trim()) {
+          fmsg.focus();
           return;
         }
 
@@ -7538,7 +7539,6 @@
         const originalText = submitBtn ? submitBtn.innerHTML : '';
 
         try {
-          // Show sending state
           if (submitBtn) {
             submitBtn.disabled = true;
             submitBtn.innerHTML = 'Sending...';
@@ -7546,6 +7546,12 @@
 
           // Collect ALL form fields
           const formData = new FormData(form);
+
+          // Ensure subject and from_name are set
+          const nameVal = qs('#fname')?.value.trim() || 'Client';
+          const subjVal = fsubj.value.trim() || 'New Project Enquiry';
+          formData.set('subject', `[A/S NEXTGEN] ${subjVal} — from ${nameVal}`);
+          formData.set('from_name', nameVal);
 
           // Send to Web3Forms
           const response = await fetch(
@@ -7562,8 +7568,6 @@
           const result = await response.json();
 
           if (result.success) {
-
-            // Only show success AFTER API confirms it
             if (success) {
               success.classList.add('show');
             }
@@ -7579,25 +7583,18 @@
             }, 6000);
 
           } else {
-
             alert(
-              'Unable to send your message. Please try again.'
+              result.message || 'Unable to send your message. Please try again.'
             );
-
             console.error('Web3Forms error:', result);
           }
 
         } catch (error) {
-
           console.error('Contact form error:', error);
-
           alert(
             'Unable to send your message. Please check your internet connection and try again.'
           );
-
         } finally {
-
-          // Restore button
           if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalText;
